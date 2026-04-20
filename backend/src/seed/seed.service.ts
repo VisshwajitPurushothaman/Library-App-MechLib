@@ -12,68 +12,67 @@ export class SeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    // Requirement #2: Disable automatic seeding in production unless explicitly enabled
-    if (this.configService.get('ENABLE_SEED') === 'true') {
-      try {
-        console.log('🌱 Starting database seeding process...'); // Requirement #4: Logging
-        await this.seed();
-        console.log('🌿 Seeding process completed successfully');
-      } catch (error) {
-        console.error('❌ Database seeding failed during startup:', error.message); // Requirement #6: Prevent crash
-      }
-    } else {
-      console.log('ℹ️ Database seeding skipped (ENABLE_SEED != true)');
+    console.log('ENABLE_SEED:', process.env.ENABLE_SEED); // Requirement #5
+
+    if (process.env.ENABLE_SEED !== 'true') {
+      console.log('Seeding skipped');
+      return;
+    }
+
+    try {
+      await this.seed();
+    } catch (error) {
+      console.error('Seed failed:', error.message);
     }
   }
 
   async seed() {
-    // Seed Admin
+    console.log('🌱 Starting database seeding process...');
+
     const adminEmail = this.configService.get('ADMIN_EMAIL');
     const adminRoll = this.configService.get('ADMIN_ROLL');
     const adminPass = this.configService.get('ADMIN_PASSWORD');
 
-    // Requirement #3: Strict validation inside seed
-    if (!adminEmail || typeof adminEmail !== 'string') {
-      console.warn('⚠️ Skipping Admin seeding: Invalid or missing ADMIN_EMAIL');
-    } else if (!adminRoll || !adminPass) {
-      console.warn('⚠️ Skipping Admin seeding: Missing ROLL or PASSWORD');
-    } else {
-      const existingAdmin = await this.usersService.findOneByIdentifier(adminEmail);
-      if (!existingAdmin) {
-        await this.usersService.create({
-          roll_number: adminRoll,
-          name: 'Library Admin',
-          email: adminEmail,
-          password_hash: adminPass,
-          role: 'admin',
-        });
-        console.log(`✅ Admin user seeded: ${adminEmail}`); // Requirement #4: Logging
-      } else {
-        console.log('ℹ️ Default admin already exists, skipping seed');
-      }
-    }
-
-    // Seed Demo User
     const demoEmail = this.configService.get('DEMO_USER_EMAIL');
     const demoRoll = this.configService.get('DEMO_USER_ROLL');
     const demoPass = this.configService.get('DEMO_USER_PASSWORD');
 
-    // Requirement #3: Strict validation inside seed
-    if (!demoEmail || typeof demoEmail !== 'string') {
-      console.warn('⚠️ Skipping Demo User seeding: Invalid or missing DEMO_USER_EMAIL');
-    } else if (!demoRoll || !demoPass) {
-      console.warn('⚠️ Skipping Demo User seeding: Missing ROLL or PASSWORD');
-    } else {
-      const existingDemo = await this.usersService.findOneByIdentifier(demoEmail);
-      if (!existingDemo) {
-        await this.usersService.create({
-          roll_number: demoRoll,
-          name: 'Arjun Sharma',
-          email: demoEmail,
-          password_hash: demoPass,
-          role: 'user',
-        });
-        console.log(`✅ Demo user seeded: ${demoEmail}`); // Requirement #4: Logging
+    const usersToSeed = [
+      {
+        email: adminEmail,
+        roll_number: adminRoll,
+        name: 'Library Admin',
+        password_hash: adminPass,
+        role: 'admin' as const,
+      },
+      {
+        email: demoEmail,
+        roll_number: demoRoll,
+        name: 'Arjun Sharma',
+        password_hash: demoPass,
+        role: 'user' as const,
+      },
+    ];
+
+    // Requirement #3: FIX SEED LOOP VALIDATION
+    for (const entry of usersToSeed) {
+      if (!entry || (!entry.email && !entry.roll_number)) {
+        console.warn('Skipping invalid seed entry:', entry);
+        continue;
+      }
+
+      const identifier = entry.email || entry.roll_number;
+
+      if (!identifier) {
+        continue;
+      }
+
+      const existing = await this.usersService.findOneByIdentifier(identifier);
+      if (!existing) {
+        await this.usersService.create(entry);
+        console.log(`✅ User seeded: ${identifier}`);
+      } else {
+        console.log(`ℹ️ User already exists: ${identifier}`);
       }
     }
 
