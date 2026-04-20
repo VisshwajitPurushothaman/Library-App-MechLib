@@ -22,9 +22,18 @@ export default function UserDashboard() {
         api.get("/user/stats"),
         api.get("/issues"),
       ]);
-      setStats(s);
-      setIssues(i);
-    } catch {}
+      const statsPayload = s?.data ?? s ?? null;
+      const issuesPayload = Array.isArray(i?.data) ? i.data : Array.isArray(i) ? i : [];
+      // #region agent log
+      fetch('http://127.0.0.1:7373/ingest/3723e0ba-5dee-4e9f-86c6-0a0d4ab428e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11865b'},body:JSON.stringify({sessionId:'11865b',runId:'post-fix',hypothesisId:'H9_student_dashboard_data_load_fails_after_login',location:'user/Dashboard.jsx:27',message:'user dashboard normalized payloads',data:{statsShape:s?Object.keys(s):[],issuesShape:i?Object.keys(i):[],normalizedIssuesCount:issuesPayload.length},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      setStats(statsPayload);
+      setIssues(issuesPayload);
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7373/ingest/3723e0ba-5dee-4e9f-86c6-0a0d4ab428e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11865b'},body:JSON.stringify({sessionId:'11865b',runId:'pre-fix',hypothesisId:'H9_student_dashboard_data_load_fails_after_login',location:'user/Dashboard.jsx:29',message:'user dashboard data load failed',data:{message:err?.message,status:err?.response?.status,responseMessage:err?.response?.data?.message,path:err?.config?.url},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+    }
   };
 
   useEffect(() => { load(); }, []);

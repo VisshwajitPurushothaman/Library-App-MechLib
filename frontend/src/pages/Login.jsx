@@ -35,11 +35,20 @@ export default function Login() {
     if (!validate()) return;
     setSubmitting(true);
     try {
+      // #region agent log
+      fetch('http://127.0.0.1:7373/ingest/3723e0ba-5dee-4e9f-86c6-0a0d4ab428e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11865b'},body:JSON.stringify({sessionId:'11865b',runId:'pre-fix',hypothesisId:'H1_frontend_submits_unexpected_role_or_identifier',location:'Login.jsx:38',message:'login submit payload (sanitized)',data:{role,identifierPreview:identifier.trim().slice(0,3),identifierLength:identifier.trim().length,passwordLength:password.length},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       const user = await login(identifier.trim(), password, role);
+      if (!user?.name || !user?.role) {
+        throw new Error("Login response is missing user profile fields");
+      }
       toast.success(`Welcome back, ${user.name.split(" ")[0]}`);
       const target = user.role === "admin" ? "/admin" : "/app";
       nav(loc.state?.from?.pathname || target, { replace: true });
     } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7373/ingest/3723e0ba-5dee-4e9f-86c6-0a0d4ab428e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11865b'},body:JSON.stringify({sessionId:'11865b',runId:'pre-fix',hypothesisId:'H5_frontend_receives_auth_error',location:'Login.jsx:46',message:'login submit caught error',data:{message:err?.message,responseStatus:err?.response?.status,responseMessage:err?.response?.data?.message},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       const msg = formatApiError(err, "Unable to sign in");
       toast.error(msg);
       setErrors((prev) => ({ ...prev, form: msg }));
