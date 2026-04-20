@@ -12,38 +12,69 @@ export class SeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seed();
+    // Requirement #2: Disable automatic seeding in production unless explicitly enabled
+    if (this.configService.get('ENABLE_SEED') === 'true') {
+      try {
+        console.log('🌱 Starting database seeding process...'); // Requirement #4: Logging
+        await this.seed();
+        console.log('🌿 Seeding process completed successfully');
+      } catch (error) {
+        console.error('❌ Database seeding failed during startup:', error.message); // Requirement #6: Prevent crash
+      }
+    } else {
+      console.log('ℹ️ Database seeding skipped (ENABLE_SEED != true)');
+    }
   }
 
   async seed() {
-    console.log('🌱 Seeding database...');
-
     // Seed Admin
     const adminEmail = this.configService.get('ADMIN_EMAIL');
-    const existingAdmin = await this.usersService.findOneByIdentifier(adminEmail);
-    if (!existingAdmin) {
-      await this.usersService.create({
-        roll_number: this.configService.get('ADMIN_ROLL'),
-        name: 'Library Admin',
-        email: adminEmail,
-        password_hash: this.configService.get('ADMIN_PASSWORD'), // Service handles hashing
-        role: 'admin',
-      });
-      console.log('✅ Admin user seeded');
+    const adminRoll = this.configService.get('ADMIN_ROLL');
+    const adminPass = this.configService.get('ADMIN_PASSWORD');
+
+    // Requirement #3: Strict validation inside seed
+    if (!adminEmail || typeof adminEmail !== 'string') {
+      console.warn('⚠️ Skipping Admin seeding: Invalid or missing ADMIN_EMAIL');
+    } else if (!adminRoll || !adminPass) {
+      console.warn('⚠️ Skipping Admin seeding: Missing ROLL or PASSWORD');
+    } else {
+      const existingAdmin = await this.usersService.findOneByIdentifier(adminEmail);
+      if (!existingAdmin) {
+        await this.usersService.create({
+          roll_number: adminRoll,
+          name: 'Library Admin',
+          email: adminEmail,
+          password_hash: adminPass,
+          role: 'admin',
+        });
+        console.log(`✅ Admin user seeded: ${adminEmail}`); // Requirement #4: Logging
+      } else {
+        console.log('ℹ️ Default admin already exists, skipping seed');
+      }
     }
 
     // Seed Demo User
     const demoEmail = this.configService.get('DEMO_USER_EMAIL');
-    const existingDemo = await this.usersService.findOneByIdentifier(demoEmail);
-    if (!existingDemo) {
-      await this.usersService.create({
-        roll_number: this.configService.get('DEMO_USER_ROLL'),
-        name: 'Arjun Sharma',
-        email: demoEmail,
-        password_hash: this.configService.get('DEMO_USER_PASSWORD'),
-        role: 'user',
-      });
-      console.log('✅ Demo user seeded');
+    const demoRoll = this.configService.get('DEMO_USER_ROLL');
+    const demoPass = this.configService.get('DEMO_USER_PASSWORD');
+
+    // Requirement #3: Strict validation inside seed
+    if (!demoEmail || typeof demoEmail !== 'string') {
+      console.warn('⚠️ Skipping Demo User seeding: Invalid or missing DEMO_USER_EMAIL');
+    } else if (!demoRoll || !demoPass) {
+      console.warn('⚠️ Skipping Demo User seeding: Missing ROLL or PASSWORD');
+    } else {
+      const existingDemo = await this.usersService.findOneByIdentifier(demoEmail);
+      if (!existingDemo) {
+        await this.usersService.create({
+          roll_number: demoRoll,
+          name: 'Arjun Sharma',
+          email: demoEmail,
+          password_hash: demoPass,
+          role: 'user',
+        });
+        console.log(`✅ Demo user seeded: ${demoEmail}`); // Requirement #4: Logging
+      }
     }
 
     // Seed Books

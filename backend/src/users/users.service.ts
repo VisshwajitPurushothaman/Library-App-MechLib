@@ -40,11 +40,15 @@ export class UsersService {
     return user;
   }
 
-  async findOneByIdentifier(identifier: string) {
+  async findOneByIdentifier(identifier?: string) {
+    if (!identifier || typeof identifier !== 'string') {
+      return null; // Return null instead of throwing error (Requirement #1)
+    }
+
     const user = await this.usersRepository.findOne({
       where: [
-        { email: identifier.toLowerCase() },
-        { roll_number: identifier.toUpperCase() },
+        { email: identifier.toLowerCase() }, // Normalize (Requirement #2)
+        { roll_number: identifier.toUpperCase() }, // Normalize (Requirement #2)
       ],
     });
     return user;
