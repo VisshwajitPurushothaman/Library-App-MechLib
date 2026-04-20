@@ -1,0 +1,97 @@
+{
+  "brand": {
+    "name": "MechLib",
+    "description": "Premium Library Management Web App for Mechanical Engineering Department"
+  },
+  "theme": {
+    "mode": "auto",
+    "archetype": "Archetype 4 (Swiss & High-Contrast) + Organic Warmth",
+    "colors": {
+      "light": {
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "primary": "#0F172A",
+        "accent": "#D97706",
+        "text_main": "#0F172A",
+        "text_muted": "#64748B",
+        "border": "#E2E8F0",
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "danger": "#EF4444"
+      },
+      "dark": {
+        "background": "#020617",
+        "surface": "#0F172A",
+        "primary": "#F8FAFC",
+        "accent": "#F59E0B",
+        "text_main": "#F8FAFC",
+        "text_muted": "#94A3B8",
+        "border": "#1E293B",
+        "success": "#059669",
+        "warning": "#D97706",
+        "danger": "#DC2626"
+      }
+    },
+    "typography": {
+      "headings": {
+        "family": "Outfit",
+        "banned": ["Inter", "Roboto", "Open Sans", "Lato", "Syne"]
+      },
+      "body": {
+        "family": "IBM Plex Sans"
+      },
+      "scale": {
+        "h1": "text-4xl sm:text-5xl tracking-tight font-bold",
+        "h2": "text-2xl sm:text-3xl tracking-tight font-semibold",
+        "h3": "text-xl sm:text-2xl font-medium tracking-tight",
+        "h4": "text-lg sm:text-xl font-medium",
+        "body": "text-base leading-relaxed",
+        "small": "text-sm text-muted-foreground uppercase tracking-widest"
+      }
+    },
+    "surfaces": {
+      "card": "bg-surface border border-border rounded-xl shadow-sm",
+      "glass": "backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)]",
+      "sidebar": "bg-surface border-r border-border"
+    }
+  },
+  "layout": {
+    "spacing": "Generous spacing philosophy (p-6, p-8 for cards). Maintain internal padding for bordered containers.",
+    "login_page": "Centered high-impact card over an animated background. Glassmorphism is mandatory here.",
+    "admin_dashboard": "Mode B (Control Room Grid). Grid cols-1 md:grid-cols-4 gap-6. Sidebar with standard items.",
+    "user_dashboard": "Clean grids, cols-1 md:grid-cols-3 gap-6. Emphasize card clarity."
+  },
+  "components": {
+    "buttons": "rounded-lg font-medium transition-transform hover:-translate-y-0.5 active:translate-y-0",
+    "inputs": "Shadcn standard but strictly with rounded-lg borders. Use inline validation via react-hook-form.",
+    "tables": "Shadcn Table with clean, border-b only rows. Ensure robust hover states.",
+    "status_chips": "Implement custom dynamic badges (e.g., bg-emerald-100 text-emerald-800 for returned, amber for pending).",
+    "toast": "Use Sonner for toast notifications, bottom-right placement.",
+    "role_selector": "Use Shadcn Tabs or RadioGroup styled as large distinct hit-area buttons for Admin vs User.",
+    "date_picker": "Shadcn Calendar component.",
+    "charts": "Recharts for placeholder borrowing trends and popular books."
+  },
+  "animations": {
+    "hover": "transition-all duration-200 ease-in-out",
+    "page_load": "Framer Motion staggered fade-up (y: 20, opacity: 0, duration: 0.4)",
+    "login_background": "Animated abstract floating shapes (gears, books) using Framer Motion SVG elements slowly rotating/drifting."
+  },
+  "testing": {
+    "required_attributes": "All interactive elements MUST have data-testid attributes."
+  },
+  "media_urls": {
+    "login_fallback_bg": {
+      "url": "https://images.pexels.com/photos/12843342/pexels-photo-12843342.jpeg",
+      "description": "Abstract blue geometric pattern for fallback use if animated SVG is disabled."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Install `lucide-react`, `framer-motion`, `recharts`, and `@hookform/resolvers/zod`.",
+    "Configure Tailwind with the specified colors (slate/navy base, amber/gold accent) and fonts (Outfit, IBM Plex Sans).",
+    "Implement the login page with a centered glassmorphism card and an animated background featuring subtle floating gears and books (using framer-motion).",
+    "Ensure both Light and Dark themes are supported, and explicitly color text on hover states.",
+    "Admin Dashboard: Build the left sidebar, summary cards, and dynamic Issue Book panel that auto-populates book titles.",
+    "User Dashboard: Ensure clear distinction between available/unavailable books. Build the borrowing history timeline.",
+    "Add `data-testid` to all interactive UI components (buttons, links, form inputs)."
+  ]
+}
