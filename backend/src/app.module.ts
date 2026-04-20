@@ -21,7 +21,6 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
