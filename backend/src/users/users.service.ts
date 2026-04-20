@@ -78,6 +78,6 @@ export class UsersService {
       });
     }
 
-    return query.select(['user.id', 'user.name', 'user.email', 'user.roll_number', 'user.role', 'user.department', 'user.created_at']).getMany();
+    return query.getMany(); // Return raw entities (Requirement #5)
   }
 }

@@ -3,6 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from '../users/dto/user-response.dto';
+import { sanitizeUser } from '../users/utils/sanitize-user';
 
 @Injectable()
 export class AuthService {
@@ -30,10 +33,17 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    // Enforce strict DTO pipeline
+    const sanitizedUser = plainToInstance(UserResponseDto, sanitizeUser(user), {
+      excludeExtraneousValues: true,
+    });
+
     return {
       success: true,
-      token,
-      user,
+      data: {
+        token,
+        user: sanitizedUser,
+      },
     };
   }
 

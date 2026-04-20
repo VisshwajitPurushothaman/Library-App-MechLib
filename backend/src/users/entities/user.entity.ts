@@ -16,7 +16,7 @@ export class User {
   email: string;
 
   @Column()
-  @Exclude()
+  @Exclude() // Secondary safety net
   password_hash: string;
 
   @Column({
@@ -30,9 +30,11 @@ export class User {
   department: string;
 
   @Column({ default: 0 })
+  @Exclude() // Secondary safety net
   failed_login_attempts: number;
 
   @Column({ nullable: true })
+  @Exclude() // Secondary safety net
   locked_until: string;
 
   @CreateDateColumn()

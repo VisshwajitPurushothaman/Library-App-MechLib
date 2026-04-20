@@ -14,7 +14,7 @@ export class IssuesController {
   @Post('issues')
   @Roles('admin')
   async create(@Body() data: IssueInDto) {
-    return this.issuesService.issueBooks(data);
+    return { success: true, data: await this.issuesService.issueBooks(data) };
   }
 
   @Get('issues')
@@ -23,13 +23,13 @@ export class IssuesController {
     @Query('status') status?: string,
     @Query('roll_number') roll_number?: string,
   ) {
-    return this.issuesService.findAll(req.user, status, roll_number);
+    return { success: true, data: await this.issuesService.findAll(req.user, status, roll_number) };
   }
 
   @Post('issues/:id/return')
   @Roles('admin')
   async returnBook(@Param('id') id: string) {
-    return this.issuesService.returnBook(id);
+    return { success: true, data: await this.issuesService.returnBook(id) };
   }
 
   @Post('issues/:id/request-extension')
@@ -38,7 +38,7 @@ export class IssuesController {
     @Req() req: Request,
     @Body() data: ExtensionRequestDto,
   ) {
-    return this.issuesService.requestExtension(id, req.user, data);
+    return { success: true, data: await this.issuesService.requestExtension(id, req.user, data) };
   }
 
   @Post('issues/:id/extension/decide')
@@ -47,19 +47,19 @@ export class IssuesController {
     @Param('id') id: string,
     @Body() data: ExtensionDecisionDto,
   ) {
-    return this.issuesService.decideExtension(id, data);
+    return { success: true, data: await this.issuesService.decideExtension(id, data) };
   }
 
   @Get('extension-requests')
   @Roles('admin')
   async listExtensions(@Query('status') status: string = 'pending') {
-    // This is a bit redundant with the general 'issues' list but kept for compatibility with the frontend expected endpoints
     const issues = await this.issuesService.findAll({ role: 'admin' }, undefined, undefined);
-    return issues.filter(i => {
+    const data = issues.filter(i => {
       if (!i.extension_request) return false;
       if (status === 'all') return true;
       return i.extension_request.status === status;
     });
+    return { success: true, data };
   }
 
   @Get('extension-requests/pending-count')
@@ -67,6 +67,6 @@ export class IssuesController {
   async pendingCount() {
     const issues = await this.issuesService.findAll({ role: 'admin' }, undefined, undefined);
     const count = issues.filter(i => i.extension_request?.status === 'pending').length;
-    return { count };
+    return { success: true, data: { count } };
   }
 }

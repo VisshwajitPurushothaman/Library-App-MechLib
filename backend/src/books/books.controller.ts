@@ -13,28 +13,28 @@ export class BooksController {
   @Post()
   @Roles('admin')
   async create(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto);
+    return { success: true, data: await this.booksService.create(createBookDto) };
   }
 
   @Get()
   async findAll(@Query('q') q?: string) {
-    return this.booksService.findAll(q);
+    return { success: true, data: await this.booksService.findAll(q) };
   }
 
   @Get(':code')
   async findOne(@Param('code') code: string) {
-    return this.booksService.findOneByCode(code);
+    return { success: true, data: await this.booksService.findOneByCode(code) };
   }
 
   @Put(':id')
   @Roles('admin')
   async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(id, updateBookDto);
+    return { success: true, data: await this.booksService.update(id, updateBookDto) };
   }
 
   @Delete(':id')
   @Roles('admin')
   async remove(@Param('id') id: string) {
-    return this.booksService.remove(id);
+    return { success: true, data: await this.booksService.remove(id) };
   }
 }
