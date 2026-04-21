@@ -18,8 +18,8 @@ export default function History() {
       const params = {};
       if (status !== "all") params.status = status;
       if (q) params.roll_number = q;
-      const { data } = await api.get("/issues", { params });
-      setIssues(data);
+      const response = await api.get("/issues", { params });
+      setIssues(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [status]);

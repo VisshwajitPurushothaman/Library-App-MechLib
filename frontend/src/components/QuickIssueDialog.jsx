@@ -51,8 +51,8 @@ export default function QuickIssueDialog({ open, onOpenChange, trigger, onIssued
     setUser(null); setUserErr("");
     if (!roll.trim()) return;
     try {
-      const { data } = await api.get(`/users/by-roll/${roll.trim().toUpperCase()}`);
-      setUser(data);
+      const response = await api.get(`/users/by-roll/${roll.trim().toUpperCase()}`);
+      setUser(response.data.data);
     } catch (e) { setUserErr(formatApiError(e, "User not found")); }
   };
 
@@ -63,7 +63,8 @@ export default function QuickIssueDialog({ open, onOpenChange, trigger, onIssued
       return;
     }
     try {
-      const { data } = await api.get(`/books/${code.trim().toUpperCase()}`);
+      const response = await api.get(`/books/${code.trim().toUpperCase()}`);
+      const data = response.data.data;
       const t = [...titles]; t[idx] = `${data.title} — ${data.author} (${data.available_copies} left)`; setTitles(t);
     } catch {
       const t = [...titles]; t[idx] = "Not found"; setTitles(t);

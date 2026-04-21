@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -8,13 +8,14 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
   // Security
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || 'http://localhost:3000',
+    origin: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
     credentials: true,
   });
 
@@ -40,7 +41,10 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT || 8000;
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  
   await app.listen(port);
-  console.log(`🚀 NestJS Backend running on port ${port}`);
+  logger.log(`🚀 NestJS Backend running on port ${port}`);
+  logger.log(`Environment: ${nodeEnv}`);
 }
 bootstrap();

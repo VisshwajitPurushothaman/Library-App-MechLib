@@ -19,8 +19,8 @@ export default function AdminUsers() {
 
   const load = async () => {
     try {
-      const { data } = await api.get("/users", { params: { q: q || undefined } });
-      setUsers(data);
+      const response = await api.get("/users", { params: { q: q || undefined } });
+      setUsers(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, []);

@@ -14,8 +14,8 @@ export default function UserHistory() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get("/issues");
-        setIssues(data);
+        const response = await api.get("/issues");
+        setIssues(response.data.data || []);
       } catch (e) { toast.error(formatApiError(e)); }
     })();
   }, []);

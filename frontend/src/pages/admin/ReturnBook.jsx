@@ -12,8 +12,9 @@ export default function ReturnBook() {
 
   const load = async (roll) => {
     try {
-      const { data } = await api.get("/issues", { params: { roll_number: roll || undefined, status: undefined } });
-      setIssues(data.filter((i) => i.status !== "returned"));
+      const response = await api.get("/issues", { params: { roll_number: roll || undefined, status: undefined } });
+      const issues = response.data.data || [];
+      setIssues(issues.filter((i) => i.status !== "returned"));
     } catch (e) { toast.error(formatApiError(e)); }
   };
   useEffect(() => { load(); }, []);

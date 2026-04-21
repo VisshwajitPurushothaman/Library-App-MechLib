@@ -28,9 +28,6 @@ import UserSettings from "@/pages/user/Settings";
 
 function Root() {
   const { user, loading } = useAuth();
-  // #region agent log
-  fetch('http://127.0.0.1:7373/ingest/3723e0ba-5dee-4e9f-86c6-0a0d4ab428e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11865b'},body:JSON.stringify({sessionId:'11865b',runId:'pre-fix',hypothesisId:'H8_root_redirect_logic_blocks_student_login',location:'App.js:31',message:'root render auth state',data:{loading,hasUser:!!user,userRole:user?.role},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
   return <Navigate to={user.role === "admin" ? "/admin" : "/app"} replace />;

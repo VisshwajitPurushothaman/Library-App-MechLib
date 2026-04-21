@@ -11,8 +11,8 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(userData: Partial<User>) {
-    const { email, roll_number } = userData;
+  async create(userData: any) {
+    const { email, roll_number, password } = userData;
     const existing = await this.usersRepository.findOne({
       where: [{ email: email?.toLowerCase() }, { roll_number: roll_number?.toUpperCase() }],
     });
@@ -21,12 +21,14 @@ export class UsersService {
       throw new ConflictException('User with this email or roll number already exists');
     }
 
-    if (userData.password_hash) {
-      userData.password_hash = await bcrypt.hash(userData.password_hash, 10);
+    let password_hash: string | undefined;
+    if (password) {
+      password_hash = await bcrypt.hash(password, 10);
     }
 
     const user = this.usersRepository.create({
       ...userData,
+      password_hash,
       email: email?.toLowerCase(),
       roll_number: roll_number?.toUpperCase(),
     });

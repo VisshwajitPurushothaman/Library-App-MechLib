@@ -10,8 +10,8 @@ export default function Browse() {
 
   const load = async () => {
     try {
-      const { data } = await api.get("/books", { params: { q: q || undefined } });
-      setBooks(data);
+      const response = await api.get("/books", { params: { q: q || undefined } });
+      setBooks(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, []);

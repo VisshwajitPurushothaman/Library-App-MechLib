@@ -72,3 +72,10 @@ export class UpdateBookDto {
   @Matches(/^#[0-9A-Fa-f]{6}$/)
   cover_color?: string;
 }
+
+export class SearchBooksQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  q?: string;
+}

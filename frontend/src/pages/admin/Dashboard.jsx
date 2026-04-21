@@ -72,8 +72,8 @@ export default function AdminDashboard() {
     setLookup(null);
     if (!q.trim()) return;
     try {
-      const { data } = await api.get(`/users/by-roll/${q.trim().toUpperCase()}`);
-      setLookup(data);
+      const response = await api.get(`/users/by-roll/${q.trim().toUpperCase()}`);
+      setLookup(response.data.data);
     } catch (err) {
       setLookupErr(err?.response?.data?.detail || "User not found");
     }

@@ -21,24 +21,50 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: config.get<any>('DB_TYPE', 'sqlite'),
-        database: config.get<string>('DB_NAME', 'library.sqlite'),
-        autoLoadEntities: true,
-        synchronize: config.get<string>('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbType = config.get<string>('DB_TYPE', 'sqlite');
+        const isProduction = config.get<string>('NODE_ENV') === 'production';
+
+        if (dbType === 'postgres') {
+          return {
+            type: 'postgres',
+            host: config.get<string>('DB_HOST', 'localhost'),
+            port: config.get<number>('DB_PORT', 5432),
+            username: config.get<string>('DB_USER'),
+            password: config.get<string>('DB_PASSWORD'),
+            database: config.get<string>('DB_NAME'),
+            autoLoadEntities: true,
+            synchronize: !isProduction, // Never auto-sync in production!
+            migrations: ['src/migrations/*.ts'],
+            migrationsRun: isProduction, // Run migrations on startup in production
+            logging: !isProduction,
+          };
+        } else {
+          // SQLite
+          return {
+            type: 'sqlite',
+            database: config.get<string>('DB_NAME', 'library.sqlite'),
+            autoLoadEntities: true,
+            synchronize: !isProduction,
+            migrations: ['src/migrations/*.ts'],
+            migrationsRun: false, // For SQLite dev, don't auto-run
+            logging: !isProduction,
+          };
+        }
+      },
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => [
         {
-          ttl: config.get<number>('THROTTLE_TTL', 60000),
-          limit: config.get<number>('THROTTLE_LIMIT', 60),
+          ttl: config.get<number>('THROTTLE_TTL', 900000),
+          limit: config.get<number>('THROTTLE_LIMIT', 100),
         },
       ],
     }),
