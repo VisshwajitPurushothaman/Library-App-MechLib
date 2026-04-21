@@ -42,14 +42,14 @@ export class SeedService implements OnModuleInit {
         email: adminEmail,
         roll_number: adminRoll,
         name: 'Library Admin',
-        password_hash: adminPass,
+        password: adminPass,
         role: 'admin' as const,
       },
       {
         email: demoEmail,
         roll_number: demoRoll,
         name: 'Arjun Sharma',
-        password_hash: demoPass,
+        password: demoPass,
         role: 'user' as const,
       },
     ];

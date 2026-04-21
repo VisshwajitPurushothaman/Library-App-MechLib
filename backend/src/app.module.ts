@@ -39,10 +39,14 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
             password: config.get<string>('DB_PASSWORD'),
             database: config.get<string>('DB_NAME'),
             autoLoadEntities: true,
-            synchronize: !isProduction, // Never auto-sync in production!
+            synchronize: config.get<string>('DB_SYNC') === 'true', // Allows auto-syncing on initial AWS RDS boot
             migrations: ['src/migrations/*.ts'],
-            migrationsRun: isProduction, // Run migrations on startup in production
+            migrationsRun: isProduction && config.get<string>('DB_SYNC') !== 'true', 
             logging: !isProduction,
+            ssl: config.get<string>('DB_SSL') === 'true' ? { 
+              rejectUnauthorized: true,
+              ca: require('fs').readFileSync(require('path').join(process.cwd(), 'global-bundle.pem')).toString()
+            } : false,
           };
         } else {
           // SQLite

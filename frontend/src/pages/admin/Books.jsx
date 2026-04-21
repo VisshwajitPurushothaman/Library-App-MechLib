@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import BookDetailModal from "@/components/BookDetailModal";
 
 const CATEGORIES = ["Mechanics", "Thermodynamics", "Fluids", "Heat", "Design", "Manufacturing", "Engines", "HVAC", "Metrology", "Analysis", "Management", "Automation", "Automotive", "Energy", "Drafting"];
 const COLORS = ["#0F172A", "#1E40AF", "#B45309", "#047857", "#B91C1C", "#6D28D9", "#0F766E", "#9333EA", "#EA580C", "#0369A1"];
@@ -17,6 +18,8 @@ export default function AdminBooks() {
   const [books, setBooks] = useState([]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
   const [form, setForm] = useState({ code: "", title: "", author: "", category: "Mechanics", total_copies: 1, description: "", cover_color: "#0F172A" });
 
   const load = async () => {
@@ -37,13 +40,19 @@ export default function AdminBooks() {
     } catch (e) { toast.error(formatApiError(e)); }
   };
 
-  const remove = async (id) => {
+  const remove = async (id, e) => {
+    e.stopPropagation();
     if (!confirm("Remove this book?")) return;
     try {
       await api.delete(`/books/${id}`);
       toast.success("Book removed");
       load();
     } catch (e) { toast.error(formatApiError(e)); }
+  };
+
+  const handleBookClick = (book) => {
+    setSelectedBook(book);
+    setShowModal(true);
   };
 
   return (
@@ -122,9 +131,20 @@ export default function AdminBooks() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {books.map((b) => (
-          <div key={b.id} data-testid={`book-card-${b.code}`}
-            className="group rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all">
-            <div className="h-32 relative flex items-end p-4" style={{ background: `linear-gradient(135deg, ${b.cover_color} 0%, ${b.cover_color}cc 100%)` }}>
+          <button
+            key={b.id}
+            onClick={() => handleBookClick(b)}
+            data-testid={`book-card-${b.code}`}
+            className={`group rounded-2xl border overflow-hidden transition-all text-left ${
+              b.available_copies > 0
+                ? "border-border bg-card hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                : "border-red-500/30 bg-red-500/5 dark:bg-red-950/20 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+            }`}
+          >
+            <div
+              className={`h-32 relative flex items-end p-4 ${b.available_copies === 0 ? "opacity-60" : ""}`}
+              style={{ background: `linear-gradient(135deg, ${b.cover_color} 0%, ${b.cover_color}cc 100%)` }}
+            >
               <BookOpen className="absolute top-3 right-3 h-6 w-6 text-white/40" />
               <span className="font-mono text-[10px] text-white/70 uppercase tracking-widest">{b.code}</span>
             </div>
@@ -132,21 +152,27 @@ export default function AdminBooks() {
               <p className="font-heading font-semibold leading-snug line-clamp-2">{b.title}</p>
               <p className="text-xs text-muted-foreground">{b.author}</p>
               <div className="flex items-center justify-between pt-3 border-t border-border">
-                <span className="text-xs">
-                  <span className="font-semibold text-foreground">{b.available_copies}</span>
+                <span className={`text-xs ${b.available_copies > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                  <span className="font-semibold">{b.available_copies}</span>
                   <span className="text-muted-foreground"> / {b.total_copies} available</span>
                 </span>
-                <button onClick={() => remove(b.id)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-destructive" data-testid={`book-delete-${b.code}`}>
+                <button
+                  onClick={(e) => remove(b.id, e)}
+                  className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-destructive"
+                  data-testid={`book-delete-${b.code}`}
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
-          </div>
+          </button>
         ))}
         {books.length === 0 && (
           <div className="col-span-full py-16 text-center text-muted-foreground">No books match your search.</div>
         )}
       </div>
+
+      <BookDetailModal isOpen={showModal} onClose={() => setShowModal(false)} book={selectedBook} />
     </div>
   );
 }

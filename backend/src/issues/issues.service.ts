@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, LessThan } from 'typeorm';
+import { Repository, MoreThan, LessThan, IsNull } from 'typeorm';
 import { Issue } from './entities/issue.entity';
 import { UsersService } from '../users/users.service';
 import { BooksService } from '../books/books.service';
@@ -175,5 +175,13 @@ export class IssuesService {
 
     await this.issuesRepository.save(issue);
     return { success: true, decision: data.decision };
+  }
+
+  async getIssuesByBookId(bookId: string) {
+    const issues = await this.issuesRepository.find({
+      where: { book_id: bookId, return_date: IsNull() },
+      order: { created_at: 'DESC' },
+    });
+    return issues;
   }
 }

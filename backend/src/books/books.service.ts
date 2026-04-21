@@ -1,13 +1,16 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, IsNull } from 'typeorm';
 import { Book } from './entities/book.entity';
+import { Issue } from '../issues/entities/issue.entity';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book)
     private booksRepository: Repository<Book>,
+    @InjectRepository(Issue)
+    private issuesRepository: Repository<Issue>,
   ) {}
 
   async create(bookData: Partial<Book>) {
@@ -70,5 +73,12 @@ export class BooksService {
   async remove(id: string) {
     const result = await this.booksRepository.delete(id);
     return { deleted: result.affected };
+  }
+
+  async getIssuesByBookId(bookId: string) {
+    return this.issuesRepository.find({
+      where: { book_id: bookId, return_date: IsNull() },
+      order: { created_at: 'DESC' },
+    });
   }
 }

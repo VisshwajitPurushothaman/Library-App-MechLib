@@ -2,11 +2,14 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Search, BookOpen, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api, formatApiError } from "@/lib/api";
+import BookDetailModal from "@/components/BookDetailModal";
 
 export default function Browse() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all"); // all | available | unavailable
   const [books, setBooks] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const load = async () => {
     try {
@@ -21,6 +24,11 @@ export default function Browse() {
     if (filter === "unavailable") return books.filter((b) => b.available_copies === 0);
     return books;
   }, [books, filter]);
+
+  const handleBookClick = (book) => {
+    setSelectedBook(book);
+    setShowModal(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -65,9 +73,24 @@ export default function Browse() {
         {visible.map((b) => {
           const available = b.available_copies > 0;
           return (
-            <div key={b.id} data-testid={`browse-card-${b.code}`}
-              className="group rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all">
-              <div className="h-36 relative flex items-end p-4" style={{ background: `linear-gradient(135deg, ${b.cover_color} 0%, ${b.cover_color}cc 100%)` }}>
+            <button
+              key={b.id}
+              onClick={() => handleBookClick(b)}
+              data-testid={`browse-card-${b.code}`}
+              className={`group rounded-2xl border overflow-hidden transition-all text-left ${
+                available
+                  ? "border-border bg-card hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                  : "border-red-500/30 bg-red-500/5 dark:bg-red-950/20 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+              }`}
+            >
+              <div
+                className={`h-36 relative flex items-end p-4 ${
+                  available ? "" : "opacity-60"
+                }`}
+                style={{
+                  background: `linear-gradient(135deg, ${b.cover_color} 0%, ${b.cover_color}cc 100%)`,
+                }}
+              >
                 <BookOpen className="absolute top-3 right-3 h-6 w-6 text-white/40" />
                 <span className="font-mono text-[10px] text-white/70 uppercase tracking-widest">{b.code}</span>
               </div>
@@ -76,19 +99,28 @@ export default function Browse() {
                 <p className="text-xs text-muted-foreground">{b.author}</p>
                 <p className="text-[11px] inline-block px-2 py-0.5 rounded-full bg-muted text-muted-foreground uppercase tracking-wider">{b.category}</p>
                 <div className="flex items-center justify-between pt-3 border-t border-border">
-                  <span className={`chip ${available ? "chip-returned" : "chip-overdue"}`}>
+                  <span
+                    className={`chip flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
+                      available
+                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                        : "bg-red-500/15 text-red-700 dark:text-red-400"
+                    }`}
+                  >
                     {available ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                     {available ? `${b.available_copies} available` : "Unavailable"}
                   </span>
                 </div>
+                <p className="text-[10px] text-muted-foreground">Click to see details</p>
               </div>
-            </div>
+            </button>
           );
         })}
         {visible.length === 0 && (
           <div className="col-span-full py-16 text-center text-muted-foreground">No books match your criteria.</div>
         )}
       </div>
+
+      <BookDetailModal isOpen={showModal} onClose={() => setShowModal(false)} book={selectedBook} />
     </div>
   );
 }

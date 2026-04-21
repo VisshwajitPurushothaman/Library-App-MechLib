@@ -21,6 +21,13 @@ export class BooksController {
     return { success: true, data: await this.booksService.findAll(q) };
   }
 
+  @Get('issues/:bookCode')
+  async getBookIssues(@Param('bookCode') bookCode: string) {
+    const book = await this.booksService.findOneByCode(bookCode);
+    const issues = await this.booksService.getIssuesByBookId(book.id);
+    return { success: true, data: { book, issues } };
+  }
+
   @Get(':code')
   async findOne(@Param('code') code: string) {
     return { success: true, data: await this.booksService.findOneByCode(code) };
