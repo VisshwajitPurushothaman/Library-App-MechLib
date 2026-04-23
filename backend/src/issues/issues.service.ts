@@ -27,6 +27,19 @@ export class IssuesService {
         throw new BadRequestException(`Book ${code} is unavailable`);
       }
 
+      // Ensure user hasn't already borrowed this book
+      const activeIssue = await this.issuesRepository.findOne({
+        where: {
+          user_id: user.id,
+          book_code: book.code,
+          return_date: IsNull(),
+        },
+      });
+
+      if (activeIssue) {
+        throw new BadRequestException(`User already has an active issue for ${book.title}`);
+      }
+
       const issue = this.issuesRepository.create({
         id: uuidv4(),
         user_id: user.id,
