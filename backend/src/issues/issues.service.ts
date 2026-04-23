@@ -20,24 +20,22 @@ export class IssuesService {
     const user = await this.usersService.findOneByIdentifier(data.roll_number);
     if (!user) throw new NotFoundException('User not found');
 
+    const existingIssues = await this.issuesRepository.find({
+      where: { roll_number: data.roll_number, status: 'issued' },
+    });
+    const existingBookCodes = existingIssues.map(issue => issue.book_code);
+    
+    const duplicates = data.book_codes.filter(code => existingBookCodes.includes(code));
+    if (duplicates.length > 0) {
+      console.log("Duplicate check hit");
+      throw new BadRequestException(`Already issued: ${duplicates.join(', ')}`);
+    }
+
     const created = [];
     for (const code of data.book_codes) {
       const book = await this.booksService.findOneByCode(code);
       if (book.available_copies < 1) {
         throw new BadRequestException(`Book ${code} is unavailable`);
-      }
-
-      // Ensure user hasn't already borrowed this book
-      const activeIssue = await this.issuesRepository.findOne({
-        where: {
-          user_id: user.id,
-          book_code: book.code,
-          return_date: IsNull(),
-        },
-      });
-
-      if (activeIssue) {
-        throw new BadRequestException(`User already has an active issue for ${book.title}`);
       }
 
       const issue = this.issuesRepository.create({
