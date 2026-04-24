@@ -45,7 +45,8 @@ async function bootstrap() {
   const port = process.env.PORT || 8000;
   const nodeEnv = process.env.NODE_ENV || 'development';
   
-  await app.listen(port);
+  app.setGlobalPrefix('api');
+  await app.listen(port, '0.0.0.0');
   logger.log(`🚀 NestJS Backend running on port ${port}`);
   logger.log(`Environment: ${nodeEnv}`);
 }
