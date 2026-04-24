@@ -17,6 +17,7 @@ export default function ReturnBook() {
       setIssues(issues.filter((i) => i.status !== "returned"));
     } catch (e) { toast.error(formatApiError(e)); }
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const returnIt = async (id, title) => {

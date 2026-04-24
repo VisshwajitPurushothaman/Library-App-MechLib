@@ -36,6 +36,7 @@ export default function UserDashboard() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const active = issues.filter((i) => i.status !== "returned");
