@@ -16,11 +16,14 @@ api.interceptors.request.use((config) => {
 });
 
 export function formatApiError(err, fallback = "Something went wrong") {
-  const detail = err?.response?.data?.detail;
+  const data = err?.response?.data;
+  const detail = data?.detail || data?.message;
+
   if (!detail) return err?.message || fallback;
   if (typeof detail === "string") return detail;
-  if (Array.isArray(detail))
-    return detail.map((e) => (e?.msg ? e.msg : JSON.stringify(e))).join(" ");
+  if (Array.isArray(detail)) {
+    return detail.map((e) => (typeof e === 'string' ? e : (e?.msg || JSON.stringify(e)))).join(" ");
+  }
   if (detail?.msg) return detail.msg;
   return fallback;
 }

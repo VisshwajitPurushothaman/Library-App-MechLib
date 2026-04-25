@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString, IsArray, ArrayMinSize, ArrayMaxSize, Matches, IsO
 
 export class IssueInDto {
   @IsNotEmpty()
-  @Matches(/^[A-Z0-9]{3,12}$/)
+  @Matches(/^[A-Z0-9]{3,12}$/i)
   roll_number: string;
 
   @IsArray()
