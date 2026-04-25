@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray, ArrayMinSize, ArrayMaxSize, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, ArrayMinSize, ArrayMaxSize, Matches, IsOptional } from 'class-validator';
 
 export class IssueInDto {
   @IsNotEmpty()
@@ -33,7 +33,7 @@ export class ExtensionDecisionDto {
   @IsNotEmpty()
   decision: 'approve' | 'decline';
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   admin_note: string = '';
 }

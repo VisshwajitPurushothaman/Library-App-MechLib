@@ -16,6 +16,12 @@ export class StatsController {
     return { success: true, data: await this.statsService.getAdminStats() };
   }
 
+  @Get('admin/reports')
+  @Roles('admin')
+  async getAdminReports() {
+    return { success: true, data: await this.statsService.getReportStats() };
+  }
+
   @Get('user/stats')
   async getUserStats(@Req() req: Request) {
     return { success: true, data: await this.statsService.getUserStats(req.user) };

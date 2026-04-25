@@ -15,23 +15,6 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { api, formatApiError } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 
-const POPULAR_BOOKS = [
-  { name: "Thermo", borrows: 28 },
-  { name: "Fluids", borrows: 24 },
-  { name: "Mechanics", borrows: 22 },
-  { name: "Heat Tx", borrows: 18 },
-  { name: "Design", borrows: 17 },
-  { name: "CAD", borrows: 14 },
-];
-const TREND = [
-  { m: "Jul", issued: 42, returned: 30 },
-  { m: "Aug", issued: 56, returned: 44 },
-  { m: "Sep", issued: 68, returned: 58 },
-  { m: "Oct", issued: 74, returned: 63 },
-  { m: "Nov", issued: 82, returned: 71 },
-  { m: "Dec", issued: 64, returned: 60 },
-];
-
 export default function AdminDashboard() {
   const nav = useNavigate();
   const [stats, setStats] = useState(null);
@@ -154,7 +137,7 @@ export default function AdminDashboard() {
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={TREND} margin={{ left: -10 }}>
+              <LineChart data={stats?.trends || []} margin={{ left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="m" stroke="hsl(var(--muted-foreground))" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} axisLine={false} tickLine={false} />
@@ -175,7 +158,7 @@ export default function AdminDashboard() {
           <p className="text-xs text-muted-foreground mt-0.5 mb-4">Top borrowed categories</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={POPULAR_BOOKS} margin={{ left: -10 }}>
+              <BarChart data={stats?.popular_books || []} margin={{ left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} axisLine={false} tickLine={false} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} axisLine={false} tickLine={false} />
