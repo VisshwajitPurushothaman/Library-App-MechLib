@@ -28,6 +28,12 @@ export class BooksController {
     return { success: true, data: { book, issues } };
   }
 
+  @Post('issues/batch')
+  async getBatchIssues(@Body('codes') codes: string[]) {
+    const issues = await this.booksService.getIssuesByBookCodes(codes);
+    return { success: true, data: { issues } };
+  }
+
   @Get(':code')
   async findOne(@Param('code') code: string) {
     return { success: true, data: await this.booksService.findOneByCode(code) };

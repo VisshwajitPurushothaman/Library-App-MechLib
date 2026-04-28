@@ -14,7 +14,7 @@ export default function BookDetailModal({ isOpen, onClose, book }) {
       setLoading(true);
       (async () => {
         try {
-          const response = await api.get(`/books/issues/${book.code}`);
+          const response = await api.post(`/books/issues/batch`, { codes: book.codes });
           setIssues(response.data.data.issues || []);
         } catch (e) {
           toast.error(formatApiError(e));
@@ -53,7 +53,7 @@ export default function BookDetailModal({ isOpen, onClose, book }) {
                 <div className="flex items-start gap-4 flex-1">
                   <div
                     className="w-20 h-28 rounded-lg flex items-end p-2"
-                    style={{ background: `linear-gradient(135deg, ${book.cover_color} 0%, ${book.cover_color}cc 100%)` }}
+                    style={{ background: `linear-gradient(135deg, ${available ? book.cover_color : '#EF4444'} 0%, ${available ? book.cover_color : '#B91C1C'}cc 100%)` }}
                   >
                     <BookOpen className="h-4 w-4 text-white/60" />
                   </div>

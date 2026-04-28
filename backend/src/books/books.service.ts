@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, IsNull } from 'typeorm';
+import { Repository, Like, IsNull, In } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { Issue } from '../issues/entities/issue.entity';
 
@@ -78,6 +78,13 @@ export class BooksService {
   async getIssuesByBookId(bookId: string) {
     return this.issuesRepository.find({
       where: { book_id: bookId, return_date: IsNull() },
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async getIssuesByBookCodes(codes: string[]) {
+    return this.issuesRepository.find({
+      where: { book_code: In(codes), return_date: IsNull() },
       order: { created_at: 'DESC' },
     });
   }
