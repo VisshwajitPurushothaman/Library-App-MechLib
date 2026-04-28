@@ -15,11 +15,22 @@ export class AuthService {
   ) {}
 
   async validateUser(identifier: string, pass: string): Promise<any> {
+    console.log(`[AuthDebug] Attempting login for: "${identifier}"`);
     const user = await this.usersService.findOneByIdentifier(identifier);
-    if (user && (await bcrypt.compare(pass, user.password_hash))) {
-      return user;
+    
+    if (!user) {
+      console.log(`[AuthDebug] User NOT found in database for identifier: "${identifier}"`);
+      return null;
     }
-    return null;
+
+    const isMatch = await bcrypt.compare(pass, user.password_hash);
+    if (!isMatch) {
+      console.log(`[AuthDebug] Password MISMATCH for user: "${identifier}"`);
+      return null;
+    }
+
+    console.log(`[AuthDebug] Login SUCCESS for user: "${identifier}" (Role: ${user.role})`);
+    return user;
   }
 
   async login(user: any, response: Response) {
@@ -52,7 +63,7 @@ export class AuthService {
       roll_number: userData.roll_number,
       name: userData.name,
       email: userData.email,
-      password_hash: userData.password, // UsersService will hash it
+      password: userData.password, // Corrected from password_hash to password
       role: userData.role || 'user',
     });
 
