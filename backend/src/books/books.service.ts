@@ -16,7 +16,7 @@ export class BooksService {
   async create(bookData: Partial<Book>) {
     const existing = await this.booksRepository.findOne({ where: { code: bookData.code?.toUpperCase() } });
     if (existing) {
-      throw new ConflictException('Book code already exists');
+      throw new ConflictException('A book with this unique code already exists in the catalog.');
     }
     const book = this.booksRepository.create({
       ...bookData,
@@ -43,13 +43,13 @@ export class BooksService {
 
   async findOneByCode(code: string) {
     const book = await this.booksRepository.findOne({ where: { code: code.toUpperCase() } });
-    if (!book) throw new NotFoundException('Book not found');
+    if (!book) throw new NotFoundException('The requested book could not be found in our records.');
     return book;
   }
 
   async findOneById(id: string) {
     const book = await this.booksRepository.findOne({ where: { id } });
-    if (!book) throw new NotFoundException('Book not found');
+    if (!book) throw new NotFoundException('The requested book could not be found in our records.');
     return book;
   }
 

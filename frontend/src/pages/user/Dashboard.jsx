@@ -19,7 +19,7 @@ export default function UserDashboard() {
   const load = async () => {
     try {
       const [{ data: s }, { data: i }] = await Promise.all([
-        api.get("/user/stats"),
+        api.get("/stats/user"),
         api.get("/issues"),
       ]);
       const statsPayload = s?.data ?? s ?? null;

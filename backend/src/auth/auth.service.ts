@@ -20,13 +20,13 @@ export class AuthService {
     
     if (!user) {
       console.log(`[AuthDebug] User NOT found in database for identifier: "${identifier}"`);
-      return null;
+      throw new UnauthorizedException('The account identifier (email/roll number) provided was not found.');
     }
 
     const isMatch = await bcrypt.compare(pass, user.password_hash);
     if (!isMatch) {
       console.log(`[AuthDebug] Password MISMATCH for user: "${identifier}"`);
-      return null;
+      throw new UnauthorizedException('The password you entered is incorrect. Please try again.');
     }
 
     console.log(`[AuthDebug] Login SUCCESS for user: "${identifier}" (Role: ${user.role})`);

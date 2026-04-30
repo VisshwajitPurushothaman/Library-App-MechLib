@@ -18,7 +18,7 @@ export class IssuesService {
 
   async issueBooks(data: IssueInDto) {
     const user = await this.usersService.findOneByIdentifier(data.roll_number);
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('The student/faculty record for this roll number does not exist.');
 
     const existingIssues = await this.issuesRepository.find({
       where: { roll_number: data.roll_number, status: 'issued' },
@@ -28,14 +28,14 @@ export class IssuesService {
     const duplicates = data.book_codes.filter(code => existingBookCodes.includes(code));
     if (duplicates.length > 0) {
       console.log("Duplicate check hit");
-      throw new BadRequestException(`Already issued: ${duplicates.join(', ')}`);
+      throw new BadRequestException(`The following books are already issued to this user and haven't been returned: ${duplicates.join(', ')}`);
     }
 
     const created = [];
     for (const code of data.book_codes) {
       const book = await this.booksService.findOneByCode(code);
       if (book.available_copies < 1) {
-        throw new BadRequestException(`Book ${code} is unavailable`);
+        throw new BadRequestException(`The book "${book.title}" (${code}) is currently out of stock (all copies issued).`);
       }
 
       const issue = this.issuesRepository.create({
@@ -96,8 +96,8 @@ export class IssuesService {
 
   async returnBook(issueId: string) {
     const issue = await this.issuesRepository.findOne({ where: { id: issueId } });
-    if (!issue) throw new NotFoundException('Issue not found');
-    if (issue.return_date) throw new BadRequestException('Already returned');
+    if (!issue) throw new NotFoundException('The issue record for this transaction could not be located.');
+    if (issue.return_date) throw new BadRequestException('This book has already been marked as returned.');
 
     const now = new Date().toISOString();
     await this.issuesRepository.update(issueId, {
@@ -113,12 +113,12 @@ export class IssuesService {
 
   async requestExtension(issueId: string, user: any, data: ExtensionRequestDto) {
     const issue = await this.issuesRepository.findOne({ where: { id: issueId } });
-    if (!issue) throw new NotFoundException('Issue not found');
+    if (!issue) throw new NotFoundException('The issue record for this transaction could not be located.');
     if (user.role !== 'admin' && issue.user_id !== user.id) {
-      throw new BadRequestException('Not your issue');
+      throw new BadRequestException('Access denied. This book was issued to a different account.');
     }
-    if (issue.return_date) throw new BadRequestException('Book already returned');
-    if (issue.renewed) throw new BadRequestException('Already renewed once');
+    if (issue.return_date) throw new BadRequestException('This book has already been returned, so an extension cannot be requested.');
+    if (issue.renewed) throw new BadRequestException('This book has already been renewed once. Maximum 1 renewal allowed per issue.');
 
     const today = new Date().toISOString().split('T')[0];
     const daysRemaining = (new Date(issue.due_date).getTime() - new Date(today).getTime()) / (1000 * 3600 * 24);

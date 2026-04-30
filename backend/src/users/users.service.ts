@@ -18,7 +18,7 @@ export class UsersService {
     });
 
     if (existing) {
-      throw new ConflictException('User with this email or roll number already exists');
+      throw new ConflictException('An account with this email address or roll number already exists.');
     }
 
     let password_hash: string | undefined;
@@ -38,7 +38,7 @@ export class UsersService {
 
   async findOneById(id: string) {
     const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('The requested user record could not be found.');
     return user;
   }
 
@@ -65,7 +65,7 @@ export class UsersService {
 
   async remove(id: string, adminId: string) {
     if (id === adminId) {
-      throw new BadRequestException('Cannot delete yourself');
+      throw new BadRequestException('Security restriction: You cannot delete your own administrative account.');
     }
     const result = await this.usersRepository.delete(id);
     return { deleted: result.affected };

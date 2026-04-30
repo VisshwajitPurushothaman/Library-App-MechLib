@@ -6,18 +6,18 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller('api')
+@Controller('issues')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class IssuesController {
   constructor(private readonly issuesService: IssuesService) {}
 
-  @Post('issues')
+  @Post()
   @Roles('admin')
   async create(@Body() data: IssueInDto) {
     return { success: true, data: await this.issuesService.issueBooks(data) };
   }
 
-  @Get('issues')
+  @Get()
   async findAll(
     @Req() req: Request,
     @Query('status') status?: string,
@@ -26,13 +26,13 @@ export class IssuesController {
     return { success: true, data: await this.issuesService.findAll(req.user, status, roll_number) };
   }
 
-  @Post('issues/:id/return')
+  @Post(':id/return')
   @Roles('admin')
   async returnBook(@Param('id') id: string) {
     return { success: true, data: await this.issuesService.returnBook(id) };
   }
 
-  @Post('issues/:id/request-extension')
+  @Post(':id/request-extension')
   async requestExtension(
     @Param('id') id: string,
     @Req() req: Request,
@@ -41,7 +41,7 @@ export class IssuesController {
     return { success: true, data: await this.issuesService.requestExtension(id, req.user, data) };
   }
 
-  @Post('issues/:id/extension/decide')
+  @Post(':id/extension/decide')
   @Roles('admin')
   async decideExtension(
     @Param('id') id: string,

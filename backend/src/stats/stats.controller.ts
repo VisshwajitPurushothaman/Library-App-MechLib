@@ -5,24 +5,24 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller('api')
+@Controller('stats')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @Get('admin/stats')
+  @Get('admin')
   @Roles('admin')
   async getAdminStats() {
     return { success: true, data: await this.statsService.getAdminStats() };
   }
 
-  @Get('admin/reports')
+  @Get('reports')
   @Roles('admin')
   async getAdminReports() {
     return { success: true, data: await this.statsService.getReportStats() };
   }
 
-  @Get('user/stats')
+  @Get('user')
   async getUserStats(@Req() req: Request) {
     return { success: true, data: await this.statsService.getUserStats(req.user) };
   }

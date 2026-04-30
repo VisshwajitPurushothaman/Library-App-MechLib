@@ -16,7 +16,7 @@ export default function Reports() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get("/admin/reports");
+        const res = await api.get("/stats/reports");
         setStats(res.data.data);
       } catch (err) {
         console.error(err);

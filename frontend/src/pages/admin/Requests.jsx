@@ -19,7 +19,7 @@ export default function Requests() {
 
   const load = useCallback(async () => {
     try {
-      const response = await api.get("/extension-requests", { params: { status } });
+      const response = await api.get("/issues/extension-requests", { params: { status } });
       setItems(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   }, [status]);

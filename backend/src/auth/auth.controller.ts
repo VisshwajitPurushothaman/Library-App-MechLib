@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { RegisterIn, LoginIn } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -19,11 +19,8 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 900000 } }) // 5 attempts per 15 minutes
   async login(@Body() data: LoginIn, @Res({ passthrough: true }) res: Response) {
     const user = await this.authService.validateUser(data.identifier, data.password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
     if (user.role !== data.role) {
-      throw new UnauthorizedException(`This account is not a ${data.role} account`);
+      throw new UnauthorizedException(`Access denied. This account is registered as a ${user.role}, but you are trying to log in as a ${data.role}.`);
     }
     return this.authService.login(user, res);
   }

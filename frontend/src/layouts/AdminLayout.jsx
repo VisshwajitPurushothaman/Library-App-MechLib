@@ -35,7 +35,7 @@ export default function AdminLayout({ children }) {
 
   const fetchPending = useCallback(async () => {
     try {
-      const response = await api.get("/extension-requests/pending-count");
+      const response = await api.get("/issues/extension-requests/pending-count");
       setPendingCount(response.data.data.count || 0);
     } catch {}
   }, []);

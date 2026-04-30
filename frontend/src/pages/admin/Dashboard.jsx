@@ -26,7 +26,7 @@ export default function AdminDashboard() {
   const load = useCallback(async () => {
     try {
       const [{ data: s }, { data: i }] = await Promise.all([
-        api.get("/admin/stats"),
+        api.get("/stats/admin"),
         api.get("/issues"),
       ]);
       setStats(s);
