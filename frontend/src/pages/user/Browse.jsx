@@ -19,10 +19,11 @@ export default function Browse() {
   };
   
   // Reload when query changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { 
     const timer = setTimeout(() => { load(); }, 300);
     return () => clearTimeout(timer);
-  /* eslint-disable-next-line */ }, [q]);
+  }, [q]);
 
   const { groupedBooks, topBooks } = useMemo(() => {
     const map = new Map();

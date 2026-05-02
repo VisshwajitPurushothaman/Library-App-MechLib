@@ -22,7 +22,8 @@ export default function History() {
       setIssues(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   };
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [status]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [status]);
 
   return (
     <div className="ambient-bg space-y-6">

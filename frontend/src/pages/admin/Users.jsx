@@ -23,7 +23,8 @@ export default function AdminUsers() {
       setUsers(response.data.data || []);
     } catch (e) { toast.error(formatApiError(e)); }
   };
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
 
   const submit = async () => {
     try {
