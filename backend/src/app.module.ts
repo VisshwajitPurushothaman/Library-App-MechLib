@@ -43,8 +43,7 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
             migrationsRun: isProduction && config.get<string>('DB_SYNC') !== 'true', 
             logging: !isProduction,
             ssl: config.get<string>('DB_SSL') === 'true' ? { 
-              rejectUnauthorized: true,
-              ca: require('fs').readFileSync(require('path').join(process.cwd(), 'global-bundle.pem')).toString()
+              rejectUnauthorized: false,
             } : false,
           };
         } else {
