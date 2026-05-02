@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 
 export default function IssueBook() {
@@ -22,6 +23,11 @@ export default function IssueBook() {
   const [issueDate, setIssueDate] = useState(new Date());
   const [dueDate, setDueDate] = useState(addDays(new Date(), 14));
   const [submitting, setSubmitting] = useState(false);
+  const [allBooks, setAllBooks] = useState([]);
+
+  useEffect(() => {
+    api.get("/books").then(res => setAllBooks(res.data.data || [])).catch(() => {});
+  }, []);
 
   useEffect(() => {
     // adjust arrays to match numBooks
@@ -51,6 +57,7 @@ export default function IssueBook() {
   };
 
   const lookupBook = async (idx, code) => {
+    // Kept for manual code entry compatibility, but primarily using combobox now
     const next = [...codes]; next[idx] = code; setCodes(next);
     if (!code.trim()) {
       const t = [...titles]; t[idx] = ""; setTitles(t);
@@ -158,12 +165,14 @@ export default function IssueBook() {
               <div key={i} className="grid grid-cols-12 gap-3 items-end">
                 <div className="col-span-12 sm:col-span-4">
                   <Label className="text-xs">Book code #{i + 1}</Label>
-                  <Input
-                    value={code}
-                    onChange={(e) => lookupBook(i, e.target.value)}
-                    placeholder="ME101"
-                    data-testid={`issue-book-code-${i}`}
-                    className="font-mono"
+                  <BookCombobox 
+                    idx={i} 
+                    code={code} 
+                    codes={codes} 
+                    titles={titles} 
+                    setCodes={setCodes} 
+                    setTitles={setTitles} 
+                    allBooks={allBooks} 
                   />
                 </div>
                 <div className="col-span-12 sm:col-span-8">
@@ -219,6 +228,61 @@ function DatePickerBtn({ date, setDate, testid }) {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar mode="single" selected={date} onSelect={(d) => d && setDate(d)} initialFocus />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function BookCombobox({ idx, code, titles, setCodes, setTitles, codes, allBooks }) {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (book) => {
+    const nextCodes = [...codes]; nextCodes[idx] = book.code; setCodes(nextCodes);
+    const nextTitles = [...titles]; nextTitles[idx] = `${book.title} — ${book.author} (${book.available_copies} left)`; setTitles(nextTitles);
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            "mt-1.5 flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand-amber/20 focus:border-brand-amber disabled:cursor-not-allowed disabled:opacity-50 font-mono text-left",
+            !code && "text-muted-foreground"
+          )}
+          role="combobox"
+          aria-expanded={open}
+        >
+          {code ? code : "Search code/name..."}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] sm:w-[400px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Search books by title, author or code..." />
+          <CommandList>
+            <CommandEmpty>No book found.</CommandEmpty>
+            <CommandGroup>
+              {allBooks.map((book) => (
+                <CommandItem
+                  key={book.id}
+                  value={`${book.code} ${book.title} ${book.author}`}
+                  onSelect={() => handleSelect(book)}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      code === book.code ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-medium">{book.title}</span>
+                    <span className="text-[10px] text-muted-foreground">{book.code} · {book.author} · {book.available_copies} left</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   );

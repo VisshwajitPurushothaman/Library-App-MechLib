@@ -51,7 +51,7 @@ export default function UserDashboard() {
             My Library
           </p>
           <h1 className="mt-3 font-heading text-4xl sm:text-5xl font-semibold tracking-tight">
-            Hi, {user?.name?.split(" ")[0]}
+            Hi, {user?.name}
           </h1>
           <p className="text-sm text-muted-foreground mt-2 max-w-md leading-relaxed">
             A quick look at your active loans and what's waiting for you in the catalogue.

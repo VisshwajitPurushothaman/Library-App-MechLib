@@ -29,9 +29,11 @@ export default function AdminDashboard() {
         api.get("/stats/admin"),
         api.get("/issues"),
       ]);
-      setStats(s);
-      setIssues(i.slice(0, 6));
-    } catch {}
+      setStats(s?.data || null);
+      setIssues(i?.data?.slice(0, 6) || []);
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   useEffect(() => {
