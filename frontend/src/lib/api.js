@@ -2,9 +2,18 @@ import axios from "axios";
 
 export const API = (() => {
   if (process.env.NODE_ENV === "production") return "/api";
+  
   const envUrl = process.env.REACT_APP_BACKEND_URL;
-  if (envUrl && !envUrl.includes("localhost")) return envUrl + "/api";
-  return `http://${window.location.hostname}:8000/api`;
+  if (envUrl && !envUrl.includes("localhost")) {
+    // Strip port 8000 if it was accidentally set for the production domain
+    return envUrl.replace(":8000", "") + "/api";
+  }
+  
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return `http://${window.location.hostname}:8000/api`;
+  }
+  
+  return "/api";
 })();
 
 export const api = axios.create({
