@@ -28,7 +28,7 @@ export default function ChangePasswordSection() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await api.post("/auth/change-password", { current_password: current, new_password: next });
+      await api.patch("/auth/change-password", { current_password: current, new_password: next });
       toast.success("Password updated successfully");
       setCurrent(""); setNext(""); setConfirm(""); setErrors({});
     } catch (err) {

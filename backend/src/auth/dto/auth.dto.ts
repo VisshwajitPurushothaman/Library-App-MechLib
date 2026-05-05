@@ -2,7 +2,7 @@ import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches, IsEnum, I
 
 export class RegisterIn {
   @IsNotEmpty()
-  @Matches(/^[A-Z0-9]{3,12}$/, { message: 'Roll number must be 3-12 alphanumeric uppercase characters' })
+  @Matches(/^[A-Z0-9]{3,15}$/i, { message: 'Roll number must be 3-15 alphanumeric characters' })
   roll_number: string;
 
   @IsNotEmpty()

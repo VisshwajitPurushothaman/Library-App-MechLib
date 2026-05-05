@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Res, UnauthorizedException, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, UnauthorizedException, Get, UseGuards, Req, Patch } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterIn, LoginIn } from './dto/auth.dto';
+import { RegisterIn, LoginIn, ChangePasswordIn } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -35,5 +35,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async me(@Req() req: Request) {
     return this.authService.getMe(req.user);
+  }
+
+  @Patch('change-password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(@Req() req: Request, @Body() data: ChangePasswordIn) {
+    return this.authService.changePassword((req.user as any).id, data);
   }
 }
